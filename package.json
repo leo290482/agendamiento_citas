@@ -1,0 +1,16 @@
+{
+  "name": "agendamiento_citas",
+  "version": "1.0.0",
+  "description": "Modulo para agendamiento de citas Meyer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leonardo Navarro",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "joi": "^17.2.0",
+    "nodemon": "^2.0.4"
+  }
+}
