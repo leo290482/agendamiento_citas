@@ -9,8 +9,13 @@
   "author": "Leonardo Navarro",
   "license": "ISC",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "config": "^3.3.1",
+    "export": "^0.1.337",
     "express": "^4.17.1",
     "joi": "^17.2.0",
+    "node-firebird": "^0.9.3",
+    "node-gyp": "^7.0.0",
     "nodemon": "^2.0.4"
   }
 }
