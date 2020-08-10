@@ -18,6 +18,7 @@ app.use(express.json());
 
 let clientes  = [];
 let vehiculos = [];
+let ordenes   = [];
 
 app.get('/', (req, res) => {
     res.send('Agendamiento de citas.');
@@ -109,6 +110,71 @@ app.get('/api/vehiculos/:placa',(req, res) => {
             }
             else
             res.status(404).send('No hay resultados...'); 
+                db.detach();
+        });
+    });
+});
+
+//consulta ordenes de servicio por cliente
+app.get('/api/ordenes/:cedula',(req, res) => {
+    
+    ordenes = [];
+
+    Firebird.attach(options, function(err, db) {
+ 
+        if (err)
+            throw err;
+    
+        // db = DATABASE
+        db.query("select m.motoid,m.placa,m.modelo,t.codigo||' - '||t.descrip as tipo,m.nromotor,o.fecha as fecha_entrada,o.fechaentrega as fecha_salida,'' as estado,o.tecnico,o.obsentrada as observacion_entrada,o.observ as observacion_salida,o.comentario as comentarios_cliente,o.ordenserid as id,c.nit,c.nombre,c.direcc1,c.email,c.telef1,c.terid,o.km as kilometraje_moto from ordenser o left join terceros c on o.cliente=c.terid left join moto m on o.moto=m.motoid  left join tipomoto t on m.tipomotoid=t.tipomotoid where c.nit=?",req.params.cedula, function(err, result) {
+            if (result != undefined)
+            { 
+                for (i=0; i< result.length ; i++){
+
+                    var vehiculo = {
+                        id: result[i].MOTOID,
+                        placa: result[i].PLACA.toString('latin1'),
+                        modelo: result[i].MODELO.toString('latin1'),
+                        tipo: result[i].TIPO.toString('latin1'),
+                        nromotor: result[i].NROMOTOR.toString('latin1')
+                    };
+
+                    var cliente = {
+                        cedula: result[i].NIT.toString('latin1'),
+                        nombre: result[i].NOMBRE.toString('latin1'),
+                        direccion: result[i].DIRECC1.toString('latin1'),
+                        email: result[i].EMAIL,
+                        telefono: result[i].TELEF1.toString('latin1'),
+                        id: result[i].TERID
+                    };
+
+                    var orden = {
+                        moto: vehiculo,
+                        fecha_entrada: result[i].FECHA_ENTRADA,
+                        fecha_salida: result[i].FECHA_SALIDA,
+                        estado: result[i].ESTADO,
+                        tecnico: result[i].tecnico,
+                        observacion_entrada: result[i].OBSERVACION_ENTRADA,
+                        observacion_salida:result[i].OBSERVACION_SALIDA.toString('latin1'),
+                        comentarios_cliente:result[i].COMENTARIOS_CLIENTE.toString('latin1'),
+                        id:result[i].ID,
+                        cliente: cliente,
+                        kilometraje_moto:result[i].KILOMETRAJE_MOTO
+                    };
+
+                    ordenes.push(orden); 
+                }   
+                 
+                if(ordenes.length>0){
+                    res.send(ordenes); 
+                }
+                else
+                {
+                    res.status(404).send('El cliente no fue encontrado');  
+                }       
+            }
+            else
+            res.status(404).send('No hay resultados...');  
                 db.detach();
         });
     });
